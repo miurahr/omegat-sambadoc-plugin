@@ -43,6 +43,11 @@
     <delete file="${dist.dir}/README.TXT"/>
   </target>
 
+  <target name="-post-clean">
+    <delete dir="dist2"/>
+    <delete dir="dist"/>
+  </target>
+
   <target name="release" depends="jar">
     <mkdir dir="dist"/>
     <copy todir="dist" file="README.md"/>
