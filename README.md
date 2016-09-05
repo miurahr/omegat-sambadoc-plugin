@@ -4,6 +4,21 @@ The **SambaDoc Filter Plugin for OmegaT** project provides Samba documents' docb
 
  * The latest stable version of the SambaDoc Filter Plugin for OmegaT is at https://bintray.com/miurahr/omegat-plugins
 
+## Build
+
+SambaDoc filter plugin uses Gradle build system. You need to connect internet and
+sinmply run following command:
+
+```
+$ ./gradlew build
+```
+
+or on Windows
+
+```
+$ .\gradlew.bat build
+```
+
 ## Install:
 
   After OmegaT installation completed, you can install plugin.
