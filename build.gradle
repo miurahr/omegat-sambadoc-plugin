@@ -1,74 +1,32 @@
-apply plugin: 'java'
-apply plugin: 'jacoco'
-apply plugin: 'findbugs'
-apply plugin: 'checkstyle'
-apply plugin: 'distribution'
-
-version = '0.1'
-
-configurations {
-    provided
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'distribution'
+    id "org.omegat.gradle" version "1.4.2"
+    id "com.palantir.git-version" version "0.12.3"
 }
 
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
-        test.compileClasspath += configurations.provided
-        test.runtimeClasspath += configurations.provided
-    }
+if (versionDetails().isCleanTag) {
+    version = versionDetails().lastTag.substring(1)
+} else {
+    version = versionDetails().lastTag.substring(1) + "-" + versionDetails().commitDistance + "-" + versionDetails().gitHash + "-SNAPSHOT"
 }
 
-repositories {
-    jcenter()
+omegat {
+    version = "5.4.1"
+    pluginClass = "org.samba.doc.lib.omegat.SambaDocFilter"
 }
 
 dependencies {
-    provided 'commons-io:commons-io:2.4'
-    provided 'commons-lang:commons-lang:2.6'
-    provided project(":stub")
     testCompile 'org.testng:testng:6.9.10'
-    testCompile project(":stub")
 }
 test.useTestNG()
-
-jar {
-    from files(sourceSets.main.output.classesDir)
-    from {configurations.compile.collect {zipTree(it)}} {
-        exclude "META-INF/MANIFEST.MF"
-    }
-    manifest {
-        attributes("OmegaT-Plugins": "org.samba.doc.lib.omegat.SambaDocFilter")
-    }
-}
 
 checkstyle {
     config = resources.text.fromFile("${rootProject.projectDir}/config/checkstyle/checkstyle.xml")
     ignoreFailures = true
     toolVersion = '7.1'
-}
-
-// Force prevent checkstyle/findbugs on Test.
-task checkstyleTest(overwrite: true) << {}
-task findbugsTest(overwrite: true) << {}
-
-findbugs {
-    ignoreFailures = true
-}
-tasks.withType(FindBugs) {
-    reports {
-      xml.enabled = false
-      html.enabled = true
-    }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives jar
-    archives sourceJar
 }
 
 distTar {
@@ -79,18 +37,7 @@ distributions {
     main {
         contents {
             from('README.md')
-            from(sourceJar) {
-                into 'source'
-            }
-            from(jar) {
-                into 'plugin'
-            }
+            from(jar)
         }
     }
 }
-
-
-project(":stub") {
-    apply plugin: 'java'
-}
-
